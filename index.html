@@ -4,8 +4,165 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dorf Dash — SFWHS lunch runs</title>
+  <meta name="description" content="Tiny West Portal / Stonestown fetch service for SF Waldorf High School. Cash only. Not DoorDash. A gnome with a tote bag." />
+  <style>
+    :root { --moss:#1c3a2e; --cream:#f4ead4; --paper:#fff8ea; --ink:#1a1814; --hat:#c23b2e; --gold:#e0b44b; --mute:#6b6458; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"Trebuchet MS","Gill Sans","Segoe UI",sans-serif; background:radial-gradient(1200px 600px at 10% -10%,#2d5a44 0%,transparent 50%),var(--moss); color:var(--cream); }
+    .wrap { max-width:720px; margin:0 auto; padding:28px 18px 80px; }
+    header { text-align:center; }
+    .mark { width:88px; height:88px; margin:0 auto 10px; background:var(--paper); border-radius:22px; display:grid; place-items:center; box-shadow:0 8px 0 #12261e; }
+    h1 { font-size:clamp(2.2rem,8vw,3.4rem); letter-spacing:-.04em; margin:8px 0 0; line-height:.95; }
+    .tag { display:inline-block; margin-top:10px; background:var(--hat); color:#fff; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; padding:5px 10px; border-radius:999px; }
+    .lede { color:#d7c9a8; max-width:34em; margin:14px auto 0; line-height:1.45; }
+    .run { margin:22px 0; background:#163227; border:1px solid #3a6a52; border-radius:16px; padding:14px 16px; display:flex; justify-content:space-between; gap:12px; align-items:center; }
+    .run span { color:#cbb992; font-size:.9rem; }
+    .pill { background:var(--gold); color:#1a1814; font-weight:700; padding:6px 10px; border-radius:999px; white-space:nowrap; font-size:.8rem; }
+    h2 { font-size:1.15rem; margin:28px 0 10px; }
+    .store { background:var(--paper); color:var(--ink); border-radius:16px; padding:14px; margin-bottom:12px; }
+    .store h3 { margin:0 0 8px; }
+    .item { display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px dashed #e2d3b4; }
+    .item:first-of-type { border-top:0; }
+    .item label { flex:1; cursor:pointer; }
+    .fee { font-size:.75rem; color:var(--mute); }
+    .rules { background:#12261e; border-radius:16px; padding:16px 18px; color:#e7dcc3; line-height:1.5; }
+    form { background:var(--paper); color:var(--ink); border-radius:16px; padding:16px; }
+    label.field { display:block; font-size:.85rem; font-weight:700; margin:12px 0 6px; }
+    input, select, textarea { width:100%; font:inherit; padding:10px 12px; border-radius:10px; border:1px solid #d7c7a4; background:#fffdf6; }
+    textarea { min-height:70px; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media (max-width:520px){ .row { grid-template-columns:1fr; } }
+    .check { display:flex; gap:8px; align-items:flex-start; margin:14px 0; }
+    .check input { width:auto; margin-top:3px; }
+    button { width:100%; border:0; background:var(--hat); color:#fff; font:inherit; font-weight:700; font-size:1.05rem; padding:13px; border-radius:12px; cursor:pointer; }
+    .out { display:none; margin-top:12px; background:#12261e; color:var(--cream); border-radius:12px; padding:12px; white-space:pre-wrap; font-family:ui-monospace,Menlo,monospace; font-size:.82rem; }
+    footer { text-align:center; color:#9aa892; font-size:.8rem; margin-top:36px; }
+  </style>
 </head>
 <body>
-  <p>placeholder</p>
+  <div class="wrap">
+    <header>
+      <div class="mark" aria-hidden="true">
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <ellipse cx="32" cy="56" rx="16" ry="5" fill="#cbb992"/>
+          <path d="M18 34c0 12 6 20 14 20s14-8 14-20-8-16-14-16-14 4-14 16z" fill="#f0c9a0"/>
+          <path d="M16 30c2-16 14-22 16-22 3 0 16 8 16 22 0 2-32 2-32 0z" fill="#c23b2e"/>
+          <circle cx="32" cy="12" r="4" fill="#f4ead4"/>
+          <circle cx="26" cy="34" r="2" fill="#1a1814"/>
+          <circle cx="38" cy="34" r="2" fill="#1a1814"/>
+          <path d="M28 40c2 3 6 3 8 0" fill="none" stroke="#1a1814" stroke-width="1.5"/>
+          <rect x="22" y="44" width="20" height="10" rx="2" fill="#3d7a58"/>
+        </svg>
+      </div>
+      <div class="tag">Not DoorDash · cash only · SFWHS</div>
+      <h1>Dorf Dash</h1>
+      <p class="lede">Weston & Loden will walk to West Portal (lunch) or Stonestown (after school) if you reserve something and actually have cash. Five customers is a crowd.</p>
+    </header>
+    <div class="run">
+      <div>
+        <strong id="runName">West Portal lunch</strong>
+        <span>Locks <b id="lockLabel">12:20</b> · 2 stops max · fee to the Dorfer</span>
+      </div>
+      <div class="pill" id="zonePill">WEST PORTAL</div>
+    </div>
+    <h2>Today’s short menu</h2>
+    <p style="margin-top:-6px;color:#cbb992;font-size:.9rem">Swap the list in the page source when the day’s spots change.</p>
+    <div id="menu"></div>
+    <h2>The rules, said out loud</h2>
+    <ul class="rules">
+      <li>A reserve is not an order. We buy after you confirm and we know you’ll pay.</li>
+      <li>Cash on handoff. No cash = it was never a run.</li>
+      <li>Lunch is West Portal only. Stonestown is a separate dash.</li>
+      <li>If we already have two stops, you’re on the next one.</li>
+      <li>Pickup gets announced in Discord. We don’t hunt you across campus.</li>
+    </ul>
+    <h2>Reserve a thing</h2>
+    <form id="form">
+      <div class="row">
+        <div>
+          <label class="field" for="name">Your name</label>
+          <input id="name" required placeholder="the freshman we already know" />
+        </div>
+        <div>
+          <label class="field" for="contact">Discord or phone</label>
+          <input id="contact" required placeholder="@you or a number" />
+        </div>
+      </div>
+      <label class="field" for="run">Which dash</label>
+      <select id="run">
+        <option value="West Portal lunch">West Portal lunch</option>
+        <option value="Stonestown after school">Stonestown after school</option>
+      </select>
+      <label class="field" for="note">Anything else</label>
+      <textarea id="note" placeholder="no ice, courtyard pickup, I have a five…"></textarea>
+      <label class="check">
+        <input type="checkbox" id="cash" required />
+        <span>I will have cash when you get back. If I flake, I buy the next round for whoever got stuck with my drink.</span>
+      </label>
+      <button type="submit" id="go">Copy order for Discord</button>
+      <pre class="out" id="out"></pre>
+    </form>
+    <footer>Parody gnome. Not affiliated with DoorDash. Built for a lunch period at 470 West Portal Ave.</footer>
+  </div>
+  <script>
+    const MENU = [
+      { store: "West Portal — drinks / quick", items: [
+        { name: "Milk tea / boba", cost: 7.5, fee: 2 },
+        { name: "Coffee drink", cost: 6, fee: 2 },
+        { name: "Water / soda from a corner shop", cost: 3, fee: 2 }
+      ]},
+      { store: "West Portal — food", items: [
+        { name: "Sandwich / deli thing", cost: 12, fee: 2.5 },
+        { name: "Cheap sit-down lunch special (one stop only)", cost: 16, fee: 3 }
+      ]},
+      { store: "Stonestown (after school only)", items: [
+        { name: "One named item from one store — write it in the note", cost: 12, fee: 3 }
+      ]}
+    ];
+    const menuEl = document.getElementById("menu");
+    MENU.forEach((store, si) => {
+      const box = document.createElement("div");
+      box.className = "store";
+      box.innerHTML = "<h3>" + store.store + "</h3>";
+      store.items.forEach((item, ii) => {
+        const id = "i-" + si + "-" + ii;
+        const row = document.createElement("div");
+        row.className = "item";
+        row.innerHTML = '<input type="checkbox" id="'+id+'" data-store="'+store.store+'" data-name="'+item.name+'" data-cost="'+item.cost+'" data-fee="'+item.fee+'" /><label for="'+id+'">'+item.name+'<div class="fee">item ~$'+item.cost.toFixed(2)+' + $'+item.fee.toFixed(2)+' run fee</div></label><div>$'+(item.cost+item.fee).toFixed(0)+'</div>';
+        box.appendChild(row);
+      });
+      menuEl.appendChild(box);
+    });
+    document.getElementById("run").addEventListener("change", (e) => {
+      const s = e.target.value.includes("Stonestown");
+      document.getElementById("runName").textContent = e.target.value;
+      document.getElementById("lockLabel").textContent = s ? "15:10" : "12:20";
+      document.getElementById("zonePill").textContent = s ? "STONESTOWN" : "WEST PORTAL";
+    });
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const picked = [...document.querySelectorAll("#menu input:checked")].map((el) => ({
+        store: el.dataset.store, name: el.dataset.name, cost: Number(el.dataset.cost), fee: Number(el.dataset.fee)
+      }));
+      if (!picked.length) { alert("Pick at least one thing."); return; }
+      const total = picked.reduce((s,i) => s + i.cost + i.fee, 0);
+      const note = document.getElementById("note").value.trim();
+      const msg = [
+        "DORF DASH RESERVE",
+        "Who: " + document.getElementById("name").value.trim(),
+        "Contact: " + document.getElementById("contact").value.trim(),
+        "Run: " + document.getElementById("run").value,
+        "Items:",
+        ...picked.map((i) => "  • " + i.name + " (" + i.store + ")  ~$" + (i.cost+i.fee).toFixed(2)),
+        "Est. total: $" + total.toFixed(2) + "  (cash on handoff — we do not buy first)",
+        note ? "Note: " + note : "Note: —"
+      ].join("\n");
+      const out = document.getElementById("out");
+      out.style.display = "block";
+      out.textContent = msg;
+      try { await navigator.clipboard.writeText(msg); document.getElementById("go").textContent = "Copied — paste in Discord"; }
+      catch { document.getElementById("go").textContent = "Copy failed — select the text below"; }
+    });
+  </script>
 </body>
 </html>
