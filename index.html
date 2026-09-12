@@ -34,8 +34,12 @@
     .check { display:flex; gap:8px; align-items:flex-start; margin:14px 0; }
     .check input { width:auto; }
     button { width:100%; border:0; background:var(--hat); color:#fff; font:inherit; font-weight:700; font-size:1.05rem; padding:13px; border-radius:12px; }
+    button.ghost { background:#244a3a; margin-top:8px; font-size:.9rem; }
     .out { display:none; margin-top:12px; background:#12261e; color:var(--cream); border-radius:12px; padding:12px; white-space:pre-wrap; font-family:ui-monospace,Menlo,monospace; font-size:.82rem; }
     footer { text-align:center; color:#9aa892; font-size:.8rem; margin-top:36px; }
+    details.ops { margin-top:28px; background:#12261e; border-radius:16px; padding:12px 14px; color:#e7dcc3; text-align:left; }
+    details.ops summary { cursor:pointer; font-weight:700; }
+    .ok { color:#8fd4a8; font-size:.85rem; margin-top:8px; }
   </style>
 </head>
 <body>
@@ -54,7 +58,7 @@
       <div class="pill" id="zonePill">WEST PORTAL</div>
     </div>
     <h2>Places</h2>
-    <p style="margin-top:-6px;color:#cbb992;font-size:.9rem">Prices are guesses. Real total is the register plus the run fee. Write the exact thing in the note. Stonestown is a longer walk — only if the lunch window can take it.</p>
+    <p style="margin-top:-6px;color:#cbb992;font-size:.9rem">Prices are guesses. Real total is the register plus the run fee. Write the exact thing in the note.</p>
     <div id="menu"></div>
     <h2>The rules, said out loud</h2>
     <ul class="rules">
@@ -81,29 +85,70 @@
       <button type="submit" id="go">Send / copy order</button>
       <pre class="out" id="out"></pre>
     </form>
-    <footer>Parody gnome. Not DoorDash. 470 West Portal Ave. Paste a Discord webhook into DISCORD_WEBHOOK in the page source when you have one.</footer>
+    <details class="ops">
+      <summary>Dorfer setup (you + Loden)</summary>
+      <p class="blurb" style="color:#cbb992">Create a Discord webhook on your #orders channel, paste it here, save. It stays in this phone/browser only — not in GitHub.</p>
+      <label class="field" for="hook" style="color:#f4ead4">Webhook URL</label>
+      <input id="hook" type="password" autocomplete="off" placeholder="https://discord.com/api/webhooks/..." />
+      <button type="button" class="ghost" id="saveHook">Save webhook on this device</button>
+      <button type="button" class="ghost" id="testHook">Send a test ping</button>
+      <div class="ok" id="hookStatus"></div>
+    </details>
+    <footer>Parody gnome. Not DoorDash. 470 West Portal Ave.</footer>
   </div>
   <script>
-    const DISCORD_WEBHOOK = "";
+    const HOOK_KEY = "dorfDashWebhook";
+    function hook() {
+      return (localStorage.getItem(HOOK_KEY) || "").trim();
+    }
+    function setStatus(t) { document.getElementById("hookStatus").textContent = t; }
+    function refreshStatus() {
+      setStatus(hook() ? "Webhook saved on this device." : "No webhook on this device yet.");
+    }
+    refreshStatus();
+    document.getElementById("saveHook").onclick = () => {
+      const v = document.getElementById("hook").value.trim();
+      if (!v.startsWith("https://discord.com/api/webhooks/")) {
+        setStatus("That does not look like a Discord webhook URL.");
+        return;
+      }
+      localStorage.setItem(HOOK_KEY, v);
+      document.getElementById("hook").value = "";
+      refreshStatus();
+    };
+    document.getElementById("testHook").onclick = async () => {
+      const url = hook();
+      if (!url) { setStatus("Save a webhook first."); return; }
+      try {
+        const r = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content: "Dorf Dash test ping. If you see this, webhooks work." })
+        });
+        setStatus(r.ok ? "Test landed in Discord." : "Discord said no (" + r.status + "). Make a new webhook.");
+      } catch (err) {
+        setStatus("Browser blocked it or the URL is dead. Copy still works.");
+      }
+    };
     const MENU = [
-      { store: "Shaw's", blurb: "122 West Portal Ave. Candy counter since the Depression: fudge, nostalgic sweets, Mitchell's ice cream. Fast if the line is short.", items: [{ name: "Ice cream scoop", cost: 6, fee: 2 }, { name: "Candy / fudge", cost: 5, fee: 2 }] },
-      { store: "Little Original Joe's", blurb: "393 West Portal Ave. Takeout Italian from the Joe's family. Pizza by the slice at lunch, pasta, rotisserie chicken. Elena's next door is too slow for a dash.", items: [{ name: "Pizza slice", cost: 4, fee: 2 }, { name: "Garlic knots", cost: 10, fee: 2 }, { name: "Sandwich / wrap", cost: 16, fee: 2.5 }] },
-      { store: "Submarine Center", blurb: "820 Ulloa St by the tunnel. Subs since 1981. Hot pastrami and the Atomic (pastrami + turkey + corned beef). Mini / Center / Super. Often a line.", items: [{ name: "Mini sub (write which)", cost: 10, fee: 2 }, { name: "Center sub", cost: 13, fee: 2.5 }, { name: "Hot pastrami", cost: 14, fee: 2.5 }] },
-      { store: "Eezy Freezy", blurb: "Independent grocery on the avenue. Snacks and drinks without walking to a supermarket.", items: [{ name: "Drink + snack", cost: 6, fee: 2 }, { name: "Named grocery item", cost: 8, fee: 2 }] },
-      { store: "Safeway (Taraval)", blurb: "730 Taraval St in Parkside — not on the avenue. Real supermarket. Extra walk. Only if we are already stacking a longer run.", items: [{ name: "Named grocery / deli item", cost: 10, fee: 3 }] },
-      { store: "Hardware Coffee Co.", blurb: "32 West Portal Ave. All-day cafe, coffee, pastries. Opened 2026.", items: [{ name: "Coffee drink", cost: 6, fee: 2 }, { name: "Pastry", cost: 5, fee: 2 }] },
-      { store: "George's Donuts & Merriment", blurb: "Fancy donuts. Only if someone specifically wants one and the line is not stupid.", items: [{ name: "Donut", cost: 6, fee: 2 }] },
-      { store: "Easy Breezy", blurb: "44 West Portal Ave. Frozen yogurt. Dessert, not lunch.", items: [{ name: "Froyo", cost: 7, fee: 2 }] },
-      { store: "El Toreador", blurb: "50 West Portal Ave. Neighborhood Mexican since 1980. Burritos and plates to go if they pack fast.", items: [{ name: "Burrito / plate to go", cost: 16, fee: 2.5 }] },
-      { store: "Bursa Kebab", blurb: "60 West Portal Ave. Turkish / Mediterranean. Doner, wraps, plates.", items: [{ name: "Wrap / plate", cost: 15, fee: 2.5 }] },
-      { store: "Fresca", blurb: "24 West Portal Ave. Peruvian. Bigger plates, slower. One-stop only.", items: [{ name: "To-go plate (write the dish)", cost: 18, fee: 3 }] },
-      { store: "Squat & Gobble", blurb: "Crepes, breakfast-all-day, sandwiches. Fine if we are already on that block.", items: [{ name: "Crepe / sandwich", cost: 15, fee: 2.5 }] },
-      { store: "Peet's / Starbucks", blurb: "Chain coffee on the avenue if Hardware is slammed. Write which one.", items: [{ name: "Coffee drink", cost: 6, fee: 2 }] },
-      { store: "Bookshop West Portal", blurb: "80 West Portal Ave. Bookstore. Not lunch. Only a named cheap thing if we have time.", items: [{ name: "Named book / item", cost: 16, fee: 2 }] },
-      { store: "Stonestown — Quickly", blurb: "Level 1 near center court. Boba / milk tea. Mall trip.", items: [{ name: "Boba / milk tea (write the drink)", cost: 7.5, fee: 3 }] },
-      { store: "Stonestown — Wetzel's Pretzels", blurb: "Level 1 near Target. Soft pretzels and lemonade.", items: [{ name: "Pretzel", cost: 6, fee: 3 }, { name: "Pretzel + drink", cost: 10, fee: 3 }] },
-      { store: "Stonestown — Target", blurb: "Snacks, school stuff, a short list. Not a 20-item haul during lunch.", items: [{ name: "Named Target item", cost: 12, fee: 3 }] },
-      { store: "Stonestown — other mall food", blurb: "Shake Shack, Chipotle, Ike's, Marugame, Kura, Panda, 85°C, Wanpo, etc. Write store + exact item. One store per run.", items: [{ name: "Named item at a named store", cost: 14, fee: 3 }] }
+      { store: "Shaw's", blurb: "122 West Portal Ave. Candy counter: fudge, sweets, Mitchell's ice cream.", items: [{ name: "Ice cream scoop", cost: 6, fee: 2 }, { name: "Candy / fudge", cost: 5, fee: 2 }] },
+      { store: "Little Original Joe's", blurb: "393 West Portal Ave. Takeout Italian. Pizza by the slice at lunch.", items: [{ name: "Pizza slice", cost: 4, fee: 2 }, { name: "Garlic knots", cost: 10, fee: 2 }, { name: "Sandwich / wrap", cost: 16, fee: 2.5 }] },
+      { store: "Submarine Center", blurb: "820 Ulloa St. Subs since 1981. Hot pastrami and the Atomic.", items: [{ name: "Mini sub (write which)", cost: 10, fee: 2 }, { name: "Center sub", cost: 13, fee: 2.5 }, { name: "Hot pastrami", cost: 14, fee: 2.5 }] },
+      { store: "Eezy Freezy", blurb: "Tiny grocery on the avenue.", items: [{ name: "Drink + snack", cost: 6, fee: 2 }, { name: "Named grocery item", cost: 8, fee: 2 }] },
+      { store: "Safeway (Taraval)", blurb: "730 Taraval — extra walk. Only on a stacked run.", items: [{ name: "Named grocery / deli item", cost: 10, fee: 3 }] },
+      { store: "Hardware Coffee Co.", blurb: "32 West Portal Ave. Coffee and pastries.", items: [{ name: "Coffee drink", cost: 6, fee: 2 }, { name: "Pastry", cost: 5, fee: 2 }] },
+      { store: "George's Donuts & Merriment", blurb: "Fancy donuts.", items: [{ name: "Donut", cost: 6, fee: 2 }] },
+      { store: "Easy Breezy", blurb: "44 West Portal Ave. Froyo.", items: [{ name: "Froyo", cost: 7, fee: 2 }] },
+      { store: "El Toreador", blurb: "50 West Portal Ave. Mexican since 1980.", items: [{ name: "Burrito / plate to go", cost: 16, fee: 2.5 }] },
+      { store: "Bursa Kebab", blurb: "60 West Portal Ave. Turkish / Mediterranean.", items: [{ name: "Wrap / plate", cost: 15, fee: 2.5 }] },
+      { store: "Fresca", blurb: "24 West Portal Ave. Peruvian. One-stop only.", items: [{ name: "To-go plate (write the dish)", cost: 18, fee: 3 }] },
+      { store: "Squat & Gobble", blurb: "Crepes and sandwiches.", items: [{ name: "Crepe / sandwich", cost: 15, fee: 2.5 }] },
+      { store: "Peet's / Starbucks", blurb: "Chain coffee if Hardware is slammed.", items: [{ name: "Coffee drink", cost: 6, fee: 2 }] },
+      { store: "Bookshop West Portal", blurb: "80 West Portal Ave. Not lunch.", items: [{ name: "Named book / item", cost: 16, fee: 2 }] },
+      { store: "Stonestown — Quickly", blurb: "Boba / milk tea. Mall trip.", items: [{ name: "Boba / milk tea (write the drink)", cost: 7.5, fee: 3 }] },
+      { store: "Stonestown — Wetzel's Pretzels", blurb: "Level 1 near Target.", items: [{ name: "Pretzel", cost: 6, fee: 3 }, { name: "Pretzel + drink", cost: 10, fee: 3 }] },
+      { store: "Stonestown — Target", blurb: "Short list only.", items: [{ name: "Named Target item", cost: 12, fee: 3 }] },
+      { store: "Stonestown — other mall food", blurb: "Write store + exact item. One store per run.", items: [{ name: "Named item at a named store", cost: 14, fee: 3 }] }
     ];
     const menuEl = document.getElementById("menu");
     MENU.forEach((store, si) => {
@@ -135,11 +180,16 @@
       const note = document.getElementById("note").value.trim();
       const msg = ["DORF DASH RESERVE","Who: "+document.getElementById("name").value.trim(),"Contact: "+document.getElementById("contact").value.trim(),"Run: "+document.getElementById("run").value,"Items:",...picked.map(i => "  • "+i.name+" ("+i.store+") ~$"+(i.cost+i.fee).toFixed(2)),"Est. total: $"+total.toFixed(2)+" (cash on handoff)", note?"Note: "+note:"Note: —"].join("\n");
       const out = document.getElementById("out"); out.style.display="block"; out.textContent=msg;
-      if (DISCORD_WEBHOOK) {
-        try { await fetch(DISCORD_WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:msg})}); } catch(err) {}
+      const url = hook();
+      let sent = false;
+      if (url) {
+        try {
+          const r = await fetch(url, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ content: msg }) });
+          sent = r.ok;
+        } catch (err) { sent = false; }
       }
-      try { await navigator.clipboard.writeText(msg); } catch(err) {}
-      document.getElementById("go").textContent = DISCORD_WEBHOOK ? "Sent (and copied)" : "Copied — paste in Discord";
+      try { await navigator.clipboard.writeText(msg); } catch (err) {}
+      document.getElementById("go").textContent = sent ? "Pinged Discord" : "Copied — paste in Discord";
     });
   </script>
 </body>
