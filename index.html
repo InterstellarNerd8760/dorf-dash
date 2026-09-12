@@ -1,1 +1,130 @@
-PLACEHOLDER_SEE_NEXT
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dorf Dash — SFWHS lunch runs</title>
+  <style>
+    :root { --moss:#1c3a2e; --cream:#f4ead4; --paper:#fff8ea; --ink:#1a1814; --hat:#c23b2e; --gold:#e0b44b; --mute:#6b6458; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"Trebuchet MS","Gill Sans","Segoe UI",sans-serif; background:radial-gradient(1200px 600px at 10% -10%,#2d5a44 0%,transparent 50%),var(--moss); color:var(--cream); }
+    .wrap { max-width:720px; margin:0 auto; padding:28px 18px 80px; }
+    header { text-align:center; }
+    .mark { width:108px; height:108px; margin:0 auto 10px; background:var(--paper); border-radius:28px; overflow:hidden; box-shadow:0 8px 0 #12261e; }
+    .mark img { width:108px; height:108px; object-fit:cover; display:block; }
+    h1 { font-size:clamp(2.2rem,8vw,3.4rem); letter-spacing:-.04em; margin:8px 0 0; line-height:.95; }
+    .tag { display:inline-block; margin-top:10px; background:var(--hat); color:#fff; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; padding:5px 10px; border-radius:999px; }
+    .lede { color:#d7c9a8; max-width:34em; margin:14px auto 0; line-height:1.45; }
+    .run { margin:22px 0; background:#163227; border:1px solid #3a6a52; border-radius:16px; padding:14px 16px; display:flex; justify-content:space-between; gap:12px; align-items:center; }
+    .pill { background:var(--gold); color:#1a1814; font-weight:700; padding:6px 10px; border-radius:999px; font-size:.8rem; }
+    h2 { font-size:1.15rem; margin:28px 0 10px; }
+    .store { background:var(--paper); color:var(--ink); border-radius:16px; padding:14px; margin-bottom:12px; }
+    .blurb { margin:0 0 8px; font-size:.82rem; color:#6b6458; }
+    .item { display:flex; gap:10px; padding:8px 0; border-top:1px dashed #e2d3b4; align-items:center; }
+    .item:first-of-type { border-top:0; }
+    .item label { flex:1; cursor:pointer; }
+    .fee { font-size:.75rem; color:var(--mute); }
+    .rules { background:#12261e; border-radius:16px; padding:16px 18px; color:#e7dcc3; line-height:1.5; }
+    form { background:var(--paper); color:var(--ink); border-radius:16px; padding:16px; }
+    label.field { display:block; font-size:.85rem; font-weight:700; margin:12px 0 6px; }
+    input, select, textarea { width:100%; font:inherit; padding:10px 12px; border-radius:10px; border:1px solid #d7c7a4; background:#fffdf6; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media (max-width:520px){ .row { grid-template-columns:1fr; } }
+    .check { display:flex; gap:8px; align-items:flex-start; margin:14px 0; }
+    .check input { width:auto; }
+    button { width:100%; border:0; background:var(--hat); color:#fff; font:inherit; font-weight:700; font-size:1.05rem; padding:13px; border-radius:12px; }
+    .out { display:none; margin-top:12px; background:#12261e; color:var(--cream); border-radius:12px; padding:12px; white-space:pre-wrap; font-family:ui-monospace,Menlo,monospace; font-size:.82rem; }
+    footer { text-align:center; color:#9aa892; font-size:.8rem; margin-top:36px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="mark"><img src="gnome.jpg" alt="Dorf Dash gnome with a tote bag" /></div>
+      <div class="tag">Not DoorDash · cash only · SFWHS</div>
+      <h1>Dorf Dash</h1>
+      <p class="lede">Weston & Loden walk off campus at lunch so freshmen who can’t can still eat. Cash on handoff. Five customers is a crowd.</p>
+    </header>
+    <div class="run">
+      <div>
+        <strong id="runName">West Portal lunch</strong>
+        <span>Locks <b id="lockLabel">12:20</b> · 2 stops max · fee to the Dorfer</span>
+      </div>
+      <div class="pill" id="zonePill">WEST PORTAL</div>
+    </div>
+    <h2>Places</h2>
+    <p style="margin-top:-6px;color:#cbb992;font-size:.9rem">Real shop list is the next commit. Logo first.</p>
+    <div id="menu"></div>
+    <h2>The rules, said out loud</h2>
+    <ul class="rules">
+      <li>A reserve is not an order. We buy after you confirm and we know you’ll pay.</li>
+      <li>Cash on handoff. No cash = it was never a run.</li>
+      <li>Lunch is West Portal first.</li>
+      <li>If we already have two stops, you’re on the next one.</li>
+      <li>Pickup gets announced in Discord.</li>
+    </ul>
+    <h2>Reserve a thing</h2>
+    <form id="form">
+      <div class="row">
+        <div><label class="field" for="name">Your name</label><input id="name" required /></div>
+        <div><label class="field" for="contact">Discord or phone</label><input id="contact" required /></div>
+      </div>
+      <label class="field" for="run">Which dash</label>
+      <select id="run">
+        <option value="West Portal lunch">West Portal lunch</option>
+        <option value="Stonestown (only if we can)">Stonestown (only if we can)</option>
+      </select>
+      <label class="field" for="note">Anything else</label>
+      <textarea id="note"></textarea>
+      <label class="check"><input type="checkbox" id="cash" required /><span>I will have cash when you get back.</span></label>
+      <button type="submit" id="go">Send / copy order</button>
+      <pre class="out" id="out"></pre>
+    </form>
+    <footer>Parody gnome. Not DoorDash. 470 West Portal Ave.</footer>
+  </div>
+  <script>
+    const DISCORD_WEBHOOK = "";
+    const MENU = [
+      { store: "West Portal — drinks / quick", blurb: "Placeholder. Real shops next commit.", items: [
+        { name: "Milk tea / boba", cost: 7.5, fee: 2 }
+      ]}
+    ];
+    const menuEl = document.getElementById("menu");
+    MENU.forEach((store, si) => {
+      const box = document.createElement("div");
+      box.className = "store";
+      box.innerHTML = "<h3>" + store.store + "</h3><p class=\"blurb\">" + (store.blurb || "") + "</p>";
+      store.items.forEach((item, ii) => {
+        const id = "i-" + si + "-" + ii;
+        const row = document.createElement("div");
+        row.className = "item";
+        row.innerHTML = '<input type="checkbox" id="'+id+'" data-store="'+store.store+'" data-name="'+item.name+'" data-cost="'+item.cost+'" data-fee="'+item.fee+'" /><label for="'+id+'">'+item.name+'<div class="fee">~$'+item.cost.toFixed(2)+' + $'+item.fee.toFixed(2)+' fee</div></label>';
+        box.appendChild(row);
+      });
+      menuEl.appendChild(box);
+    });
+    document.getElementById("run").addEventListener("change", (e) => {
+      const s = e.target.value.includes("Stonestown");
+      document.getElementById("runName").textContent = e.target.value;
+      document.getElementById("lockLabel").textContent = s ? "12:10" : "12:20";
+      document.getElementById("zonePill").textContent = s ? "STONESTOWN" : "WEST PORTAL";
+    });
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const picked = [...document.querySelectorAll("#menu input:checked")].map((el) => ({
+        store: el.dataset.store, name: el.dataset.name, cost: Number(el.dataset.cost), fee: Number(el.dataset.fee)
+      }));
+      if (!picked.length) { alert("Pick at least one thing."); return; }
+      const total = picked.reduce((s,i) => s + i.cost + i.fee, 0);
+      const note = document.getElementById("note").value.trim();
+      const msg = ["DORF DASH RESERVE","Who: "+document.getElementById("name").value.trim(),"Contact: "+document.getElementById("contact").value.trim(),"Run: "+document.getElementById("run").value,"Items:",...picked.map(i => "  • "+i.name+" ("+i.store+")"),"Est. $"+total.toFixed(2), note?"Note: "+note:"Note: —"].join("\n");
+      const out = document.getElementById("out"); out.style.display="block"; out.textContent=msg;
+      if (DISCORD_WEBHOOK) {
+        try { await fetch(DISCORD_WEBHOOK, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({content: msg}) }); } catch (err) {}
+      }
+      try { await navigator.clipboard.writeText(msg); } catch (err) {}
+      document.getElementById("go").textContent = "Copied — paste in Discord";
+    });
+  </script>
+</body>
+</html>
