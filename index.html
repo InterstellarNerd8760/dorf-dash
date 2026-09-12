@@ -19,7 +19,8 @@
     .pill { background:var(--gold); color:#1a1814; font-weight:700; padding:6px 10px; border-radius:999px; font-size:.8rem; }
     h2 { font-size:1.15rem; margin:28px 0 10px; }
     .store { background:var(--paper); color:var(--ink); border-radius:16px; padding:14px; margin-bottom:12px; }
-    .blurb { margin:0 0 8px; font-size:.82rem; color:#6b6458; }
+    .store h3 { margin:0 0 4px; }
+    .blurb { margin:0 0 8px; font-size:.82rem; color:#6b6458; line-height:1.35; }
     .item { display:flex; gap:10px; padding:8px 0; border-top:1px dashed #e2d3b4; align-items:center; }
     .item:first-of-type { border-top:0; }
     .item label { flex:1; cursor:pointer; }
@@ -53,15 +54,15 @@
       <div class="pill" id="zonePill">WEST PORTAL</div>
     </div>
     <h2>Places</h2>
-    <p style="margin-top:-6px;color:#cbb992;font-size:.9rem">Real shop list is the next commit. Logo first.</p>
+    <p style="margin-top:-6px;color:#cbb992;font-size:.9rem">Prices are guesses. Real total is the register plus the run fee. Write the exact thing in the note. Stonestown is a longer walk — only if the lunch window can take it.</p>
     <div id="menu"></div>
     <h2>The rules, said out loud</h2>
     <ul class="rules">
       <li>A reserve is not an order. We buy after you confirm and we know you’ll pay.</li>
       <li>Cash on handoff. No cash = it was never a run.</li>
-      <li>Lunch is West Portal first.</li>
+      <li>Lunch is West Portal first. Stonestown only if we can.</li>
       <li>If we already have two stops, you’re on the next one.</li>
-      <li>Pickup gets announced in Discord.</li>
+      <li>Pickup gets announced in Discord. We don’t hunt you across campus.</li>
     </ul>
     <h2>Reserve a thing</h2>
     <form id="form">
@@ -75,19 +76,34 @@
         <option value="Stonestown (only if we can)">Stonestown (only if we can)</option>
       </select>
       <label class="field" for="note">Anything else</label>
-      <textarea id="note"></textarea>
-      <label class="check"><input type="checkbox" id="cash" required /><span>I will have cash when you get back.</span></label>
+      <textarea id="note" placeholder="hot pastrami mini, no onions, courtyard..."></textarea>
+      <label class="check"><input type="checkbox" id="cash" required /><span>I will have cash when you get back. If I flake, I cover whoever got stuck with my food.</span></label>
       <button type="submit" id="go">Send / copy order</button>
       <pre class="out" id="out"></pre>
     </form>
-    <footer>Parody gnome. Not DoorDash. 470 West Portal Ave.</footer>
+    <footer>Parody gnome. Not DoorDash. 470 West Portal Ave. Paste a Discord webhook into DISCORD_WEBHOOK in the page source when you have one.</footer>
   </div>
   <script>
     const DISCORD_WEBHOOK = "";
     const MENU = [
-      { store: "West Portal — drinks / quick", blurb: "Placeholder. Real shops next commit.", items: [
-        { name: "Milk tea / boba", cost: 7.5, fee: 2 }
-      ]}
+      { store: "Shaw's", blurb: "122 West Portal Ave. Candy counter since the Depression: fudge, nostalgic sweets, Mitchell's ice cream. Fast if the line is short.", items: [{ name: "Ice cream scoop", cost: 6, fee: 2 }, { name: "Candy / fudge", cost: 5, fee: 2 }] },
+      { store: "Little Original Joe's", blurb: "393 West Portal Ave. Takeout Italian from the Joe's family. Pizza by the slice at lunch, pasta, rotisserie chicken. Elena's next door is too slow for a dash.", items: [{ name: "Pizza slice", cost: 4, fee: 2 }, { name: "Garlic knots", cost: 10, fee: 2 }, { name: "Sandwich / wrap", cost: 16, fee: 2.5 }] },
+      { store: "Submarine Center", blurb: "820 Ulloa St by the tunnel. Subs since 1981. Hot pastrami and the Atomic (pastrami + turkey + corned beef). Mini / Center / Super. Often a line.", items: [{ name: "Mini sub (write which)", cost: 10, fee: 2 }, { name: "Center sub", cost: 13, fee: 2.5 }, { name: "Hot pastrami", cost: 14, fee: 2.5 }] },
+      { store: "Eezy Freezy", blurb: "Independent grocery on the avenue. Snacks and drinks without walking to a supermarket.", items: [{ name: "Drink + snack", cost: 6, fee: 2 }, { name: "Named grocery item", cost: 8, fee: 2 }] },
+      { store: "Safeway (Taraval)", blurb: "730 Taraval St in Parkside — not on the avenue. Real supermarket. Extra walk. Only if we are already stacking a longer run.", items: [{ name: "Named grocery / deli item", cost: 10, fee: 3 }] },
+      { store: "Hardware Coffee Co.", blurb: "32 West Portal Ave. All-day cafe, coffee, pastries. Opened 2026.", items: [{ name: "Coffee drink", cost: 6, fee: 2 }, { name: "Pastry", cost: 5, fee: 2 }] },
+      { store: "George's Donuts & Merriment", blurb: "Fancy donuts. Only if someone specifically wants one and the line is not stupid.", items: [{ name: "Donut", cost: 6, fee: 2 }] },
+      { store: "Easy Breezy", blurb: "44 West Portal Ave. Frozen yogurt. Dessert, not lunch.", items: [{ name: "Froyo", cost: 7, fee: 2 }] },
+      { store: "El Toreador", blurb: "50 West Portal Ave. Neighborhood Mexican since 1980. Burritos and plates to go if they pack fast.", items: [{ name: "Burrito / plate to go", cost: 16, fee: 2.5 }] },
+      { store: "Bursa Kebab", blurb: "60 West Portal Ave. Turkish / Mediterranean. Doner, wraps, plates.", items: [{ name: "Wrap / plate", cost: 15, fee: 2.5 }] },
+      { store: "Fresca", blurb: "24 West Portal Ave. Peruvian. Bigger plates, slower. One-stop only.", items: [{ name: "To-go plate (write the dish)", cost: 18, fee: 3 }] },
+      { store: "Squat & Gobble", blurb: "Crepes, breakfast-all-day, sandwiches. Fine if we are already on that block.", items: [{ name: "Crepe / sandwich", cost: 15, fee: 2.5 }] },
+      { store: "Peet's / Starbucks", blurb: "Chain coffee on the avenue if Hardware is slammed. Write which one.", items: [{ name: "Coffee drink", cost: 6, fee: 2 }] },
+      { store: "Bookshop West Portal", blurb: "80 West Portal Ave. Bookstore. Not lunch. Only a named cheap thing if we have time.", items: [{ name: "Named book / item", cost: 16, fee: 2 }] },
+      { store: "Stonestown — Quickly", blurb: "Level 1 near center court. Boba / milk tea. Mall trip.", items: [{ name: "Boba / milk tea (write the drink)", cost: 7.5, fee: 3 }] },
+      { store: "Stonestown — Wetzel's Pretzels", blurb: "Level 1 near Target. Soft pretzels and lemonade.", items: [{ name: "Pretzel", cost: 6, fee: 3 }, { name: "Pretzel + drink", cost: 10, fee: 3 }] },
+      { store: "Stonestown — Target", blurb: "Snacks, school stuff, a short list. Not a 20-item haul during lunch.", items: [{ name: "Named Target item", cost: 12, fee: 3 }] },
+      { store: "Stonestown — other mall food", blurb: "Shake Shack, Chipotle, Ike's, Marugame, Kura, Panda, 85°C, Wanpo, etc. Write store + exact item. One store per run.", items: [{ name: "Named item at a named store", cost: 14, fee: 3 }] }
     ];
     const menuEl = document.getElementById("menu");
     MENU.forEach((store, si) => {
@@ -98,7 +114,7 @@
         const id = "i-" + si + "-" + ii;
         const row = document.createElement("div");
         row.className = "item";
-        row.innerHTML = '<input type="checkbox" id="'+id+'" data-store="'+store.store+'" data-name="'+item.name+'" data-cost="'+item.cost+'" data-fee="'+item.fee+'" /><label for="'+id+'">'+item.name+'<div class="fee">~$'+item.cost.toFixed(2)+' + $'+item.fee.toFixed(2)+' fee</div></label>';
+        row.innerHTML = '<input type="checkbox" id="'+id+'" data-store="'+store.store+'" data-name="'+item.name+'" data-cost="'+item.cost+'" data-fee="'+item.fee+'" /><label for="'+id+'">'+item.name+'<div class="fee">item ~$'+item.cost.toFixed(2)+' + $'+item.fee.toFixed(2)+' run fee</div></label>';
         box.appendChild(row);
       });
       menuEl.appendChild(box);
@@ -117,13 +133,13 @@
       if (!picked.length) { alert("Pick at least one thing."); return; }
       const total = picked.reduce((s,i) => s + i.cost + i.fee, 0);
       const note = document.getElementById("note").value.trim();
-      const msg = ["DORF DASH RESERVE","Who: "+document.getElementById("name").value.trim(),"Contact: "+document.getElementById("contact").value.trim(),"Run: "+document.getElementById("run").value,"Items:",...picked.map(i => "  • "+i.name+" ("+i.store+")"),"Est. $"+total.toFixed(2), note?"Note: "+note:"Note: —"].join("\n");
+      const msg = ["DORF DASH RESERVE","Who: "+document.getElementById("name").value.trim(),"Contact: "+document.getElementById("contact").value.trim(),"Run: "+document.getElementById("run").value,"Items:",...picked.map(i => "  • "+i.name+" ("+i.store+") ~$"+(i.cost+i.fee).toFixed(2)),"Est. total: $"+total.toFixed(2)+" (cash on handoff)", note?"Note: "+note:"Note: —"].join("\n");
       const out = document.getElementById("out"); out.style.display="block"; out.textContent=msg;
       if (DISCORD_WEBHOOK) {
-        try { await fetch(DISCORD_WEBHOOK, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({content: msg}) }); } catch (err) {}
+        try { await fetch(DISCORD_WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:msg})}); } catch(err) {}
       }
-      try { await navigator.clipboard.writeText(msg); } catch (err) {}
-      document.getElementById("go").textContent = "Copied — paste in Discord";
+      try { await navigator.clipboard.writeText(msg); } catch(err) {}
+      document.getElementById("go").textContent = DISCORD_WEBHOOK ? "Sent (and copied)" : "Copied — paste in Discord";
     });
   </script>
 </body>
