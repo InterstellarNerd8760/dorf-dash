@@ -257,7 +257,7 @@ function Home() {
           <span className="text-[0.88rem] leading-snug text-hint">
             {zone === "st"
               ? "Mall run · same lunch windows · 2 stores still the cap"
-              : "Wed 12:30–1:30 · Thu 11:30–2:30 · lock before we walk"}
+              : "Wed 12:30–1:30 · Thu 11:30–12:30 · lock before we walk"}
           </span>
           <div className="mt-2 flex flex-wrap gap-1.5">
             <span className="rounded-full bg-moss-deep px-2 py-1 text-xs text-cream">
