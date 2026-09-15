@@ -15,4 +15,5 @@ block discord.com still work, and so the URL never shows up in GitHub or View So
 
 This GitHub Pages copy only copies the reserve text. Use the live site to ping Discord.
 
-Prices in `app.js` are Sept 2026 in-store research (not delivery markup). Friends are photographing paper menus next; swap numbers in `MENU` when those land.
+Prices in `app.js` are in-store / pickup research from Sept 14 2026 (not delivery markup).
+Friends are photographing paper menus next; swap numbers in `MENU` when those land.
