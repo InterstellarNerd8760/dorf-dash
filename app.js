@@ -1,6 +1,4 @@
-const HOOK_KEY = "dorfDashWebhook";
 const STATE_KEY = "dorfDashRunState";
-const BUILTIN_HOOK = "";
 const KID_CAP = 5;
 const STOP_CAP = 2;
 const MENU = [
@@ -79,7 +77,6 @@ const MENU = [
 let zone = "wp";
 let showExtra = false;
 const extraSeen = { wp:false, st:false };
-function hook() { return (localStorage.getItem(HOOK_KEY) || BUILTIN_HOOK || "").trim(); }
 function runState() { return localStorage.getItem(STATE_KEY) || "open"; }
 function setRunState(s) { localStorage.setItem(STATE_KEY, s); paintState(); }
 function paintState() {
@@ -174,30 +171,7 @@ document.getElementById("moreBtn").onclick = () => { showExtra = !showExtra; ext
 document.getElementById("markOpen").onclick = () => setRunState("open");
 document.getElementById("markFull").onclick = () => setRunState("full");
 document.getElementById("markWalk").onclick = () => setRunState("walk");
-function setStatus(t) { document.getElementById("hookStatus").textContent = t; }
-function refreshStatus() {
-  const local = (localStorage.getItem(HOOK_KEY) || "").trim();
-  if (local) setStatus("Using webhook saved on this device.");
-  else if (BUILTIN_HOOK) setStatus("Using the deployed webhook. School computers can send.");
-  else setStatus("No webhook in the deploy and none on this device. Paste into BUILTIN_HOOK and republish.");
-}
-refreshStatus();
 paintState();
-document.getElementById("saveHook").onclick = () => {
-  const v = document.getElementById("hook").value.trim();
-  if (!v.startsWith("https://discord.com/api/webhooks/")) { setStatus("That does not look like a Discord webhook URL."); return; }
-  localStorage.setItem(HOOK_KEY, v);
-  document.getElementById("hook").value = "";
-  refreshStatus();
-};
-document.getElementById("testHook").onclick = async () => {
-  const url = hook();
-  if (!url) { setStatus("Save a webhook first."); return; }
-  try {
-    const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: "Dorf Dash test ping. If you see this, webhooks work." }) });
-    setStatus(r.ok ? "Test landed in Discord." : "Discord said no (" + r.status + ").");
-  } catch (err) { setStatus("Browser blocked it or the URL is dead. Copy still works."); }
-};
 document.getElementById("form").addEventListener("submit", async (e) => {
   e.preventDefault();
   if (runState() !== "open") { alert("This run is closed."); return; }
@@ -223,15 +197,7 @@ document.getElementById("form").addEventListener("submit", async (e) => {
   const out = document.getElementById("out");
   out.style.display = "block";
   out.textContent = msg;
-  const url = hook();
-  let sent = false;
-  if (url) {
-    try {
-      const r = await fetch(url, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ content: msg }) });
-      sent = r.ok;
-    } catch (err) { sent = false; }
-  }
   try { await navigator.clipboard.writeText(msg); } catch (err) {}
-  document.getElementById("go").textContent = sent ? "Pinged Discord" : "Copied — paste in Discord";
+  document.getElementById("go").textContent = "Copied — paste in Discord or use the live site";
 });
 renderMenu();

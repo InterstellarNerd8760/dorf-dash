@@ -1,0 +1,6 @@
+# Discord webhook lockbox — never commit. Lives only on the live Grok Build server.
+hook.server.ts
+src/lib/hook.server.ts
+.env
+.env.*
+*.secret

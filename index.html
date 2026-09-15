@@ -146,17 +146,13 @@
     </form>
     <details class="ops">
       <summary>Dorfer setup (you + Loden)</summary>
-      <p class="hint">Paste the webhook into the page source as BUILTIN_HOOK before you deploy. Every school computer then posts to Discord. A save on this device only overrides that built-in URL.</p>
+      <p class="hint">This GitHub copy never holds the Discord webhook. School computers should order on the live Grok Build site so the ping is sent from the server. Open / full / walk here is only this browser.</p>
       <p>
         <button type="button" class="ghost" id="markOpen">Mark run open</button>
         <button type="button" class="ghost" id="markFull">Mark run full</button>
         <button type="button" class="ghost" id="markWalk">Mark walking back</button>
       </p>
-      <label class="field" for="hook" style="color:#f4ead4">Webhook URL</label>
-      <input id="hook" type="password" autocomplete="off" placeholder="https://discord.com/api/webhooks/..." />
-      <button type="button" class="ghost" id="saveHook">Save webhook on this device</button>
-      <button type="button" class="ghost" id="testHook">Send a test ping</button>
-      <div class="ok" id="hookStatus"></div>
+      <div class="ok" id="hookStatus">Webhook is not in this repo. Use the live site to ping Discord.</div>
     </details>
     <footer>Parody gnome. Not DoorDash. 470 West Portal Ave.</footer>
   </div>
